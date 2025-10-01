@@ -1,0 +1,47 @@
+# Model files (too large for GitHub)
+*.h5
+*.hdf5
+*.pkl
+*.joblib
+
+# Data files
+*.npz
+*.csv
+*.json
+mnist_split_data/
+data/
+datasets/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+.venv/
+.ENV/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Large files
+*.zip
+*.tar.gz
+*.rar
+
+venv
+tfenv
+.env
+.venv
