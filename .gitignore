@@ -45,3 +45,5 @@ venv
 tfenv
 .env
 .venv
+
+anaconda_projects/
