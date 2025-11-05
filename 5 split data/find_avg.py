@@ -3,11 +3,11 @@ import numpy as np
 import tensorflow as tf
 from tensorflow import keras
 
-MODEL1_PATH = "D:\\amrita intern\\5 split data\\saved_models\\mnist_model_v1.h5"
-MODEL2_PATH = "D:\\amrita intern\\5 split data\\saved_models\\mnist_model_v2.h5"
-MODEL3_PATH = "D:\\amrita intern\\5 split data\\saved_models\\mnist_model_v3.h5"
-MODEL4_PATH = "D:\\amrita intern\\5 split data\\saved_models\\mnist_model_v4.h5"
-MODEL5_PATH = "D:\\amrita intern\\5 split data\\saved_models\\mnist_model_v5.h5"
+MODEL1_PATH = "D:\\amrita intern\\5 split data\\saved_models\\weight_exchg_1.h5"
+MODEL2_PATH = "D:\\amrita intern\\5 split data\\saved_models\\weight_exchg_2.h5"
+MODEL3_PATH = "D:\\amrita intern\\5 split data\\saved_models\\weight_exchg_3.h5"
+MODEL4_PATH = "D:\\amrita intern\\5 split data\\saved_models\\weight_exchg_4.h5"
+MODEL5_PATH = "D:\\amrita intern\\5 split data\\saved_models\\weight_exchg_5.h5"
 
 
 m1 = keras.models.load_model(MODEL1_PATH)
