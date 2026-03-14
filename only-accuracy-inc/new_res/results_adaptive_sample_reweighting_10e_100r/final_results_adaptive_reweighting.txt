@@ -1,0 +1,40 @@
+============================================================
+FEDERATED LEARNING - ADAPTIVE SAMPLE REWEIGHTING
+============================================================
+
+Configuration:
+  Number of Clients: 100
+  Communication Rounds: 100
+  Local Epochs: 10
+  Profiling Rounds: 20
+  Bottom Client Threshold: 20
+
+Overall Performance:
+  Average Final Test Accuracy: 90.83%
+  Test Accuracy Range: [88.60%, 92.80%]
+  Standard Deviation: 0.63%
+
+Client Groups:
+  Struggling Clients: 20
+    IDs: [7, 16, 17, 19, 23, 26, 37, 41, 42, 44, 50, 62, 64, 70, 79, 82, 87, 92, 97, 99]
+    Average Accuracy: 90.31%
+  Normal Clients: 80
+    Average Accuracy: 90.96%
+
+Intervention Statistics:
+  Total Interventions: 1600
+  Average per Struggling Client: 80.0
+
+Difficult Classes (for struggling clients):
+  Class 5: 20 clients
+  Class 9: 20 clients
+  Class 8: 17 clients
+  Class 7: 13 clients
+  Class 2: 11 clients
+  Class 3: 11 clients
+  Class 4: 9 clients
+  Class 6: 7 clients
+  Class 1: 2 clients
+  Class 0: 1 clients
+
+============================================================

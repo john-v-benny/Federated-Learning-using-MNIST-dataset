@@ -1,0 +1,28 @@
+============================================================
+FEDERATED LEARNING - BOTTOM 10 FORCE ACCEPT STRATEGY
+============================================================
+
+Configuration:
+  Number of Clients: 100
+  Communication Rounds: 100
+  Local Epochs per Round: 10
+  Batch Size: 32
+  Bottom Clients (forced accept): 10
+
+Final Results:
+  Average Final Training Accuracy: 95.29%
+  Average Final Test Accuracy: 89.86%
+  Training Accuracy Range: [90.00%, 99.00%]
+  Test Accuracy Range: [85.80%, 91.80%]
+
+Weight Update Statistics:
+  Total Acceptances: 1662
+  Total Rejections: 8238
+  Total Forced Accepts: 100
+  Number of 10th Rounds: 10
+  Rejection Rate: 82.38%
+  Avg Forced Accepts per Client: 1.00
+
+Final Bottom 10 Clients: [76, 19, 30, 87, 40, 33, 37, 50, 53, 60]
+
+============================================================
