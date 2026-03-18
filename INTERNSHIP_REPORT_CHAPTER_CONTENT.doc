@@ -1,0 +1,391 @@
+INTERNSHIP REPORT
+(Chapter-wise Content Only)
+
+Note: Initial/title slide page intentionally excluded as requested.
+
+==================================================================
+CHAPTER 1: INTRODUCTION
+==================================================================
+
+1.1 Background
+Federated Learning (FL) is a decentralized machine learning framework in which multiple clients collaboratively train a shared global model while keeping their raw data local. The server coordinates model updates, but training data remains distributed across clients. This paradigm has become increasingly important in domains where privacy, data ownership, and communication constraints prohibit centralized data collection.
+
+Traditional centralized learning assumes that all data is available in one location and follows similar statistical behavior. In contrast, FL must handle practical constraints such as non-identically distributed client data, variable client reliability, and communication overhead. Therefore, FL system design must balance three competing goals: performance, robustness, and privacy.
+
+1.2 Problem Statement
+Although FL solves the problem of centralized data pooling, it introduces system-level and optimization-level challenges:
+- Client data distributions are often non-IID, causing gradient drift and unstable convergence.
+- Some clients produce low-quality updates due to poor local data quality, imbalance, or insufficient samples.
+- Equal-weight aggregation may propagate harmful updates and reduce global model quality.
+- High client counts increase heterogeneity and amplify aggregation sensitivity.
+
+These issues motivated a structured investigation of robust aggregation and adaptive intervention methods.
+
+1.3 Motivation
+The internship was motivated by the need to move beyond textbook federated averaging and develop practically deployable FL workflows that can tolerate client heterogeneity. Instead of relying on one strategy, the work evaluates a family of methods that selectively accept, reject, reweight, or regulate client contributions.
+
+This study is particularly valuable because many real-world FL systems involve long-tail behavior: a subset of clients consistently underperform while a minority may exhibit noisy or outlier-like updates. The experimentation framework was designed to quantify these effects and compare mitigation strategies under controlled settings.
+
+1.4 Scope of Work
+The internship scope covered end-to-end experimentation, including:
+- Data splitting for multiple client counts (2, 5, 10, 20, 100)
+- Baseline FL pipelines and weight-averaging utilities
+- Rejection-based and deviation-based robust aggregation methods
+- Fairness-oriented interventions for low-performing clients
+- Adaptive sample reweighting and dynamic rejection mechanisms
+- Comparative analysis using standardized metrics and visual diagnostics
+- Preparation of the codebase for privacy-oriented encrypted aggregation in subsequent phases
+
+1.5 Report Organization
+This report presents objectives, system design, experimental setup, results, interpretation, limitations, and future roadmap. Chapter-wise content has been written to support direct inclusion in a formal internship submission template.
+
+
+==================================================================
+CHAPTER 2: OBJECTIVES
+==================================================================
+
+2.1 Primary Objective
+To design, implement, and evaluate robust federated learning strategies that improve stability and reliability in distributed training environments with heterogeneous clients.
+
+2.2 Specific Objectives
+1. Build reproducible FL pipelines for multiple client partition sizes.
+2. Compare baseline federated learning against robust variants under identical data conditions.
+3. Implement selective update control mechanisms (accept/reject/filter/freeze/force-accept).
+4. Quantify trade-offs between robustness controls and average final test accuracy.
+5. Evaluate adaptive methods for struggling-client assistance.
+6. Establish modular infrastructure to support secure aggregation extensions.
+
+2.3 Outcome-Oriented Targets
+- Achieve strong federated test accuracy in high-client-count settings.
+- Produce interpretable diagnostics at client and round level.
+- Identify stability-performance trade-offs with evidence.
+- Deliver chapter-ready technical documentation and reproducible artifacts.
+
+
+==================================================================
+CHAPTER 3: TOOLS, ENVIRONMENT, AND DATASET
+==================================================================
+
+3.1 Software Stack
+- Programming Language: Python
+- Machine Learning Framework: TensorFlow / Keras
+- Scientific Computing: NumPy
+- Plotting and Diagnostics: Matplotlib
+- Supporting utilities for experiment orchestration and output persistence
+
+3.2 Development Environment
+- Operating System: Windows
+- Experiment workflow primarily executed through Jupyter notebooks
+- Script-based helper modules used for model averaging and utility operations
+- Organized directory structure for split-wise and strategy-wise experiments
+
+3.3 Dataset Description
+The MNIST dataset was used as the benchmark for all experiments. It contains grayscale handwritten digit images and is suitable for controlled evaluation of federated optimization behavior. Although simple compared to modern large-scale datasets, MNIST provides a stable baseline for studying aggregation logic, client heterogeneity effects, and rejection dynamics.
+
+3.4 Data Preparation and Partitioning
+The dataset was partitioned into multiple client counts to emulate decentralized local datasets. Each client partition retained train/test structure so that local learning and evaluation remained consistent across methods. This enabled direct method comparison under controlled partitioning conditions.
+
+3.5 Workspace Experiment Segments
+- Split-wise FL experiments: 2, 5, 10, 20 clients
+- Large-scale robust experiments: 100-client variants
+- Weighted loss-based strategy experiments
+- Metrics and visual outputs saved in method-specific result folders
+
+
+==================================================================
+CHAPTER 4: SYSTEM DESIGN AND METHODOLOGY
+==================================================================
+
+4.1 Federated Learning Pipeline
+The implemented FL workflow follows an iterative communication-round pattern:
+1. Initialize global model.
+2. Distribute current model to participating clients.
+3. Perform local client training for configured epochs.
+4. Collect client updates and metadata.
+5. Apply method-specific aggregation or filtering.
+6. Update global model and evaluate progress.
+7. Repeat for defined communication rounds.
+
+4.2 Baseline Aggregation Design
+Baseline federated experiments used averaging-based update integration. Additional scripts were implemented to perform layer-wise averaging across multiple trained models, ensuring shape validation and reproducible checkpoint generation.
+
+4.3 Robust Aggregation Strategies
+
+4.3.1 Weight Rejection
+Client updates were selectively rejected based on quality-sensitive logic. The objective was to reduce negative transfer from unstable clients. Rejection counts and client-level rejection statistics were tracked for interpretability.
+
+4.3.2 Deviation Average-Median Filtering
+This strategy used deviation measures around average and median update behavior to identify and suppress outlier-like updates. It is intended to improve aggregation robustness while retaining useful information from consistent clients.
+
+4.3.3 Bottom-10 Force Accept
+To avoid complete exclusion of weak clients, this method introduced periodic forced inclusion for bottom-ranked clients. The approach addresses fairness and participation continuity while maintaining controlled rejection in other rounds.
+
+4.3.4 Bottom Freeze Strategy
+Temporarily freezing persistently low-performing clients during selected phases was used to protect global model quality. The method reflects a practical compromise between full participation and update quality control.
+
+4.3.5 Adaptive Sample Reweighting
+A profiling stage identified struggling clients and difficult classes. Subsequent rounds used adaptive intervention and sample-level emphasis to help low-performing clients learn challenging class distributions more effectively.
+
+4.3.6 Adaptive Weight Rejection
+Unlike static rejection thresholds, adaptive rejection modifies acceptance behavior across rounds, allowing stricter control in unstable phases and more flexible participation later.
+
+4.4 Weighted Loss-Based Federated Method
+An alternative approach explored client-specific contribution coefficients, shifting from equal-weight assumptions toward controlled client importance. This design aligns with scenarios where clients differ significantly in reliability, data quality, or strategic value.
+
+4.5 Observability and Diagnostics
+Across all methods, extensive diagnostics were generated:
+- Average accuracy vs rounds
+- Per-client trajectory plots
+- Rejection heatmaps and analysis figures
+- Epoch usage visualizations
+- Comparative overlays across clients and rounds
+
+This observability layer was essential for interpreting not only “how much” performance changed, but “why” it changed.
+
+
+==================================================================
+CHAPTER 5: EXPERIMENTAL SETUP
+==================================================================
+
+5.1 Experimental Matrix
+Experiments were executed across multiple combinations of:
+- Number of clients: 2, 5, 10, 20, 100
+- Local epochs: 10, 20, 100 (method-specific)
+- Communication rounds: 10, 20, 50, 100, 200
+- Batch size: 32 and 64
+
+5.2 Protocol Consistency
+For valid comparison, each method used standardized tracking outputs and comparable evaluation checkpoints. Local training and communication-round structures were maintained method-wise, with only aggregation/intervention logic changed.
+
+5.3 Evaluation Metrics
+The principal metrics used were:
+- Average final training accuracy
+- Average final test accuracy
+- Client-wise final test accuracy range
+- Standard deviation of client final test accuracy
+- Rejection rate and rejection distribution
+
+5.4 Analysis Artifacts
+Each run produced structured outputs in result folders, including:
+- Accuracy curves and overlays
+- Round-wise heatmaps
+- Individual client performance plots
+- Method-specific result summaries and final statistics
+
+5.5 Reproducibility Notes
+The workspace organization and saved outputs support rerunning individual experiments, comparing parameter variants, and reproducing chapter-level claims from generated artifacts.
+
+
+==================================================================
+CHAPTER 6: RESULTS AND ANALYSIS
+==================================================================
+
+6.1 Baseline 100-Client Federated Performance
+- Average Final Training Accuracy: 98.35%
+- Average Final Test Accuracy: 92.79%
+
+This configuration produced the best observed average federated test performance among the evaluated 100-client variants in the current workspace.
+
+6.2 Robust and Adaptive Method Results
+
+6.2.1 Weight Rejection
+- Average Final Training Accuracy: 95.88%
+- Average Final Test Accuracy: 91.09%
+- Rejection Rate: 91.17%
+
+6.2.2 Adaptive Weight Rejection
+- Average Final Test Accuracy: 91.16%
+- Rejection Rate: 83.74%
+
+6.2.3 Deviation Average-Median Strategy
+- Average Final Training Accuracy: 94.75%
+- Average Final Test Accuracy: 90.43%
+- Rejection Rate: 85.32%
+
+6.2.4 Adaptive Sample Reweighting (100 rounds)
+- Average Final Test Accuracy: 90.83%
+- Test Accuracy Range: 88.60% to 92.80%
+- Standard Deviation: 0.63%
+
+6.2.5 Adaptive Sample Reweighting (200 rounds)
+- Average Final Test Accuracy: 90.66%
+- Test Accuracy Range: 89.00% to 92.00%
+- Standard Deviation: 0.68%
+
+6.2.6 Bottom-10 Force Accept
+- Average Final Training Accuracy: 95.29%
+- Average Final Test Accuracy: 89.86%
+- Rejection Rate: 82.38%
+
+6.2.7 Bottom Freeze
+- Average Final Training Accuracy: 95.26%
+- Average Final Test Accuracy: 88.85%
+- Rejection Rate (when training): 83.67%
+
+6.3 Centralized Reference Result
+- Normal Training Final Test Accuracy: 96.00%
+
+This serves as an upper-reference benchmark for distributed settings in this project context.
+
+6.4 Comparative Interpretation
+1. High rejection rates were effective at controlling noisy updates but often reduced mean final accuracy.
+2. Adaptive controls improved balance by retaining robustness while reducing over-penalization.
+3. The baseline-style 100-client federated approach remained strongest in pure average test accuracy.
+4. Intervention-based methods improved observability of client behavior and enabled fairness-aware handling of weak participants.
+
+6.5 Stability Perspective
+Methods that included adaptive logic generally showed tighter distribution behavior and more interpretable client-group outcomes. This is important for real deployments where consistency and reliability may matter as much as peak average performance.
+
+
+==================================================================
+CHAPTER 7: KEY INFERENCES
+==================================================================
+
+7.1 Technical Inferences
+1. Robust aggregation is essential as client count increases and heterogeneity intensifies.
+2. Purely aggressive rejection can suppress useful client diversity and hurt final average performance.
+3. Adaptive mechanisms are better suited than static controls for long training schedules.
+4. Fairness-aware strategies (force-accept/freeze/reweight) provide practical control over long-tail client behavior.
+5. Strategy performance depends on both data distribution and communication schedule.
+6. Beyond accuracy, rejection statistics and dispersion metrics are critical for realistic evaluation.
+
+7.2 Experimental Inferences
+1. Increasing rounds does not guarantee performance gain; saturation can occur.
+2. Class-level difficulty patterns in struggling clients support targeted intervention design.
+3. A modular experimentation framework significantly accelerates hypothesis testing and comparison.
+
+
+==================================================================
+CHAPTER 8: WORK COMPLETED DURING INTERNSHIP
+==================================================================
+
+8.1 Implementation Contributions
+- Designed and maintained a structured FL experimentation workspace.
+- Implemented split-wise pipelines spanning 2 to 100 clients.
+- Built and tested multiple robust aggregation strategies.
+- Implemented adaptive sample reweighting and dynamic acceptance/rejection logic.
+- Implemented weight-averaging utilities with validation checks.
+
+8.2 Analysis and Reporting Contributions
+- Generated and organized method-wise result folders with plots and summaries.
+- Produced comparative diagnostic visualizations for round-wise and client-wise behavior.
+- Conducted strategy-level interpretation of accuracy, stability, and rejection patterns.
+- Prepared chapter-ready technical documentation for formal internship reporting.
+
+8.3 Privacy-Extension Preparation Work Completed
+As part of the internship, the homomorphic-encryption integration direction was prepared at design level:
+- Integration architecture and flow were finalized.
+- Encryption-aware aggregation pipeline requirements were documented.
+- Evaluation criteria for HE overhead and accuracy impact were defined.
+
+Note: Full coding-level HE deployment remains a separate implementation phase.
+
+
+==================================================================
+CHAPTER 9: LIMITATIONS
+==================================================================
+
+9.1 Dataset Limitation
+The majority of experiments were performed on MNIST. While appropriate for method development and controlled benchmarking, broader validation is needed on more complex and realistic datasets.
+
+9.2 Hyperparameter Breadth vs Depth
+Multiple parameter combinations were explored; however, exhaustive hyperparameter optimization for every strategy was not completed due to time and compute constraints.
+
+9.3 Method Trade-offs
+Some robust/fairness-oriented methods intentionally prioritize update quality and participation control, which can reduce absolute average test accuracy compared to less restrictive aggregation.
+
+9.4 System Constraints
+Large-scale encrypted FL simulations were not executed in this phase due to added computational and implementation complexity.
+
+
+==================================================================
+CHAPTER 10: FUTURE WORK AND HOMOMORPHIC ENCRYPTION ROADMAP
+==================================================================
+
+10.1 Strategic Direction
+The next major extension is homomorphic encryption (HE)-enabled federated aggregation, where client updates are encrypted before transmission and aggregated without exposing plaintext updates at the server.
+
+10.2 Work Prepared in Current Phase
+The following HE-related milestones were completed in preparation for implementation:
+- End-to-end integration blueprint finalized.
+- Component boundaries for encryption, aggregation, and decryption defined.
+- Method-compatibility mapping completed for robust FL variants.
+- Evaluation plan drafted for privacy-performance benchmarking.
+
+10.3 Planned Implementation Steps
+1. Select and integrate suitable HE primitives for vector/tensor aggregation.
+2. Implement client-side encryption of model updates.
+3. Implement encrypted server-side aggregation workflow.
+4. Implement secure key management and controlled decryption path.
+5. Validate functional correctness against plain FL baseline.
+6. Benchmark runtime, communication, and memory overhead.
+
+10.4 Validation and Benchmarking Plan
+- Accuracy preservation vs non-encrypted baseline
+- Latency and throughput measurements per round
+- Communication size growth due to ciphertext expansion
+- Scalability under different client counts and update dimensions
+- Sensitivity analysis for robust methods under encryption overhead
+
+10.5 Expected Deliverables
+- HE-integrated FL prototype
+- Comparative technical report (Plain FL vs HE-FL)
+- Deployment recommendations based on overhead-accuracy trade-offs
+
+
+==================================================================
+CHAPTER 11: CONCLUSION
+==================================================================
+
+This internship delivered a comprehensive federated learning experimentation framework with strong emphasis on robustness, adaptivity, and client-level behavior analysis. The implemented methods and resulting evidence demonstrate that practical FL system performance depends not only on average accuracy but also on how client heterogeneity is managed during aggregation.
+
+The work produced a clear comparative understanding of baseline, rejection-based, deviation-based, and adaptive strategies in high-client-count settings. In addition, the project now has a well-defined privacy extension path through homomorphic encryption integration planning. The completed engineering foundation, organized outputs, and chapter-level documentation position this work for seamless continuation into secure FL implementation.
+
+
+==================================================================
+CHAPTER 12: REFERENCES TO PROJECT ARTIFACTS
+==================================================================
+
+12.1 Core Project Files
+- Root project summary and workspace-level README
+- Weighted loss-based federated approach documentation
+- Split-wise and robust FL notebook implementations
+
+12.2 Metrics and Result Artifacts
+- Final metrics summary files generated by adaptive and bottom-client methods
+- Method-specific plot directories containing overlays, heatmaps, and accuracy trends
+
+12.3 Suggested Citation Guidance
+Use institution-prescribed citation format and include:
+- Notebook/script identifiers
+- Date/version of experiment runs
+- Result folder references for figures and tables
+
+
+==================================================================
+APPENDIX (OPTIONAL FOR FINAL SUBMISSION)
+==================================================================
+
+A. Suggested Figures
+1. Average test accuracy vs communication rounds
+2. Per-client final test accuracy distribution
+3. Rejection heatmap by client and round
+4. Adaptive intervention effects over rounds
+
+B. Suggested Tables
+1. Method-wise comparison of final training and test accuracy
+2. Method-wise rejection and acceptance statistics
+3. Method-wise stability indicators (range, standard deviation)
+
+C. Suggested Formatting Enhancements
+- Add chapter-opening summary paragraph
+- Add figure/table captions with numbering
+- Add abbreviation list (FL, HE, IID, Non-IID)
+- Add glossary of key terms
+
+D. Submission Checklist
+- Insert initial/title slide page
+- Add declaration, acknowledgement, and certificate pages (if required)
+- Add table of contents and list of figures/tables
+- Verify consistency of chapter numbering and heading styles
+- Add advisor, institution, and internship duration details
